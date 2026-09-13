@@ -9,7 +9,8 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
 function fmtQty(q){if(q==null||q==='')return '';const n=Number(q);return Number.isNaN(n)?esc(q):(Number.isInteger(n)?String(n):n.toFixed(1).replace(/\.0$/,''))}
 function buildShopping(){
  const wk=new Map(),mo=new Map();
- D.recipes.forEach(r=>(r.ingredients||[]).forEach(i=>{
+ const scheduled=D.recipes.filter(r=>Number(r.day)>=1&&Number(r.day)<=30&&Number(r.week)>=1&&Number(r.week)<=5);
+ scheduled.forEach(r=>(r.ingredients||[]).forEach(i=>{
   const key=`${norm(i.name)}|${i.unit||''}`,base={category:i.category||'Otros',ingredient:i.name,unit:i.unit||'',qty:Number(i.qty)||0};
   const wkKey=`${r.week}|${key}`,a=wk.get(wkKey)||{week:r.week,...base,qty:0,note:['Frutas','Verduras/hortalizas','Lácteos','Proteínas'].includes(base.category)?'Comprar fresco en la semana':'Puede comprarse al inicio del mes'};a.qty+=base.qty;wk.set(wkKey,a);
   const b=mo.get(key)||{...base,qty:0,note:['Frutas','Verduras/hortalizas','Lácteos','Proteínas'].includes(base.category)?'Fraccionar compra semanal':'Apto para compra mensual'};b.qty+=base.qty;mo.set(key,b);
