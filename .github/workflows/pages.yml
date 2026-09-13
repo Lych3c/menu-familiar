@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Validate V3 menu data
+        run: node scripts/validate-data.js
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
