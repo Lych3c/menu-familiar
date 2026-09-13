@@ -1,8 +1,57 @@
 (()=>{
-'use strict';const M=window.MF,{D,$,$$,state,save,norm,esc,fmtQty,mealIcon,favButton,bindFav,bindRecipeButtons}=M;
+'use strict';
+const M=window.MF,{D,$,$$,state,save,norm,esc,fmtQty,mealIcon,favButton,bindFav,bindRecipeButtons}=M;
+
 function searchText(r){return norm(`${r.name} ${r.protein} ${r.carb} ${r.produce} ${r.ingredientsText}`)}
-M.renderers.recipes=()=>{const types=['Todos','Favoritos','Desayuno','Almuerzo','Cena'],q=norm(state.recipeQuery);const list=D.recipes.filter(r=>(state.recipeFilter==='Todos'||(state.recipeFilter==='Favoritos'&&state.favorites[r.id])||r.type===state.recipeFilter)&&(!q||searchText(r).includes(q)));$('#recipes').innerHTML=`<div class="section-title"><div><h2>Biblioteca de recetas</h2><p>${D.recipes.length} recetas base · favoritas y búsquedas por ingrediente.</p></div></div><input id="recipeSearch" class="search" type="search" placeholder="Ej.: pollo, lenteja, arepa..." value="${esc(state.recipeQuery)}"><div class="chips">${types.map(t=>`<button class="chip ${state.recipeFilter===t?'active':''}" data-filter="${t}">${t}</button>`).join('')}</div><div class="recipe-list">${list.length?list.map(r=>`<article class="recipe-card"><div style="display:flex;gap:8px;align-items:center"><span class="badge">Día ${r.day} · ${mealIcon(r.type)} ${esc(r.type)}</span><span class="grow"></span>${favButton(r)}</div><div class="title">${esc(r.name)}</div><div class="sub">${esc(r.components)}</div><div class="foot"><span>⏱️ ${r.time||'—'} min</span><button class="btn small secondary" data-recipe="${esc(r.id)}">Abrir</button></div></article>`).join(''):'<div class="empty">No hay recetas que coincidan.</div>'}</div>`;$('#recipeSearch').oninput=e=>{state.recipeQuery=e.target.value;M.renderers.recipes()};$$('[data-filter]').forEach(b=>b.onclick=()=>{state.recipeFilter=b.dataset.filter;M.renderers.recipes()});bindRecipeButtons($('#recipes'));bindFav($('#recipes'))};
-function refLinks(r){const q=encodeURIComponent(r.name+' receta'),chef=encodeURIComponent(r.name+' técnica chef');return `<div class="external-links"><a class="btn secondary linkbtn" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">▶ Video / preparación</a><a class="btn secondary linkbtn" href="https://www.google.com/search?q=site%3Adirectoalpaladar.com+${q}" target="_blank" rel="noopener">🥘 Receta de referencia</a><a class="btn secondary linkbtn" href="https://www.google.com/search?q=site%3Aseriouseats.com+${chef}" target="_blank" rel="noopener">🧪 Técnica avanzada</a><a class="btn secondary linkbtn" href="https://www.google.com/search?q=site%3Aelgourmet.com+${chef}" target="_blank" rel="noopener">👨‍🍳 Versión gourmet</a></div>`}
-M.openRecipe=id=>{const r=D.recipes.find(x=>x.id===id);if(!r)return;let scale=1;const draw=()=>{$('#recipeModalBody').innerHTML=`<div class="modal-head"><div><span class="badge">Día ${r.day} · ${mealIcon(r.type)} ${esc(r.type)}</span><h2 id="modalTitle">${esc(r.name)}</h2></div>${favButton(r)}<button class="iconbtn closebtn" data-close-modal>✕</button></div><div class="recipe-meta"><span class="pill">⏱️ ${r.time||'—'} min</span><span class="pill">🥩 ${esc(r.protein)}</span><span class="pill">🍚 ${esc(r.carb)}</span><span class="pill">🥬 ${esc(r.produce)}</span></div><div class="scale-row"><strong>Escalar:</strong>${[.5,1,1.5,2].map(v=>`<button class="chip ${scale===v?'active':''}" data-scale="${v}">${v}×</button>`).join('')}</div><h3>Ingredientes</h3><ul class="ingredients">${(r.ingredients||[]).map(i=>`<li><span>${esc(i.name)}</span><b>${i.qty!=null?fmtQty(i.qty*scale):''} ${esc(i.unit||'')}</b></li>`).join('')}</ul><h3>Preparación</h3><div class="steps">${esc(r.steps)}</div><div class="card" style="margin-top:12px"><h3>👧 Adaptación niño de 4 años</h3><div class="sub">${esc(r.childNote)}</div></div><div class="card" style="margin-top:12px"><h3>Aprender más</h3><div class="sub">Enlaces de búsqueda hacia fuentes externas; revisa siempre la receta antes de usarla.</div>${refLinks(r)}</div>`;$('#recipeModal').classList.add('open');$('[data-close-modal]').onclick=()=>$('#recipeModal').classList.remove('open');bindFav($('#recipeModalBody'));$$('[data-scale]').forEach(b=>b.onclick=()=>{scale=Number(b.dataset.scale);draw()})};draw()};
-$('[data-close-modal]')?.addEventListener('click',()=>$('#recipeModal').classList.remove('open'));
+function applyRecipeSearch(){
+  const q=norm(state.recipeQuery);
+  $$('#recipes [data-recipe-search]').forEach(card=>{
+    card.hidden=!!q&&!card.dataset.recipeSearch.includes(q);
+  });
+}
+
+M.renderers.recipes=()=>{
+  const types=['Todos','Favoritos','Desayuno','Almuerzo','Cena'];
+  const list=D.recipes.filter(r=>state.recipeFilter==='Todos'||(state.recipeFilter==='Favoritos'&&state.favorites[r.id])||r.type===state.recipeFilter);
+  $('#recipes').innerHTML=`<div class="section-title"><div><h2>Biblioteca de recetas</h2><p>${D.recipes.length} recetas base · favoritas y búsquedas por ingrediente.</p></div></div><input id="recipeSearch" class="search" type="search" autocomplete="off" placeholder="Ej.: pollo, lenteja, arepa..." value="${esc(state.recipeQuery)}"><div class="chips">${types.map(t=>`<button class="chip ${state.recipeFilter===t?'active':''}" data-filter="${t}">${t}</button>`).join('')}</div><div class="recipe-list">${list.length?list.map(r=>`<article class="recipe-card" data-recipe-search="${esc(searchText(r))}"><div style="display:flex;gap:8px;align-items:center"><span class="badge">Día ${r.day} · ${mealIcon(r.type)} ${esc(r.type)}</span><span class="grow"></span>${favButton(r)}</div><div class="title">${esc(r.name)}</div><div class="sub">${esc(r.components)}</div><div class="foot"><span>⏱️ ${r.time||'—'} min</span><button class="btn small secondary" data-recipe="${esc(r.id)}">Abrir</button></div></article>`).join(''):'<div class="empty">No hay recetas que coincidan.</div>'}</div>`;
+  const input=$('#recipeSearch');
+  input.oninput=e=>{state.recipeQuery=e.target.value;applyRecipeSearch()};
+  $$('[data-filter]').forEach(b=>b.onclick=()=>{state.recipeFilter=b.dataset.filter;M.renderers.recipes()});
+  applyRecipeSearch();bindRecipeButtons($('#recipes'));bindFav($('#recipes'));
+};
+
+function refLinks(r){
+  const recipe=encodeURIComponent(r.name);
+  const technique=encodeURIComponent(`${r.protein||r.name} cooking technique`);
+  const gourmet=encodeURIComponent(`${r.protein||r.name} ${r.carb||''}`.trim());
+  return `<div class="external-links">
+    <a class="btn secondary linkbtn" href="https://www.youtube.com/results?search_query=${recipe}" target="_blank" rel="noopener noreferrer external">▶ Video / preparación</a>
+    <a class="btn secondary linkbtn" href="https://www.bbcgoodfood.com/search?q=${recipe}" target="_blank" rel="noopener noreferrer external">🥘 Recetas de referencia</a>
+    <a class="btn secondary linkbtn" href="https://www.seriouseats.com/search?q=${technique}" target="_blank" rel="noopener noreferrer external">🧪 Técnica avanzada</a>
+    <a class="btn secondary linkbtn" href="https://www.greatbritishchefs.com/search?search=${gourmet}" target="_blank" rel="noopener noreferrer external">👨‍🍳 Versión chef / gourmet</a>
+  </div>`;
+}
+
+function closeRecipeModal(){
+  $('#recipeModal')?.classList.remove('open');
+  document.body.style.overflow='';
+}
+function bindRecipeClosers(){
+  $$('[data-close-modal]').forEach(el=>el.onclick=closeRecipeModal);
+}
+
+M.openRecipe=id=>{
+  const r=D.recipes.find(x=>x.id===id);if(!r)return;
+  let scale=1;
+  const draw=()=>{
+    $('#recipeModalBody').innerHTML=`<div class="modal-head"><div><span class="badge">Día ${r.day} · ${mealIcon(r.type)} ${esc(r.type)}</span><h2 id="modalTitle">${esc(r.name)}</h2></div>${favButton(r)}<button class="iconbtn closebtn" type="button" data-close-modal aria-label="Cerrar receta">✕</button></div><div class="recipe-meta"><span class="pill">⏱️ ${r.time||'—'} min</span><span class="pill">🥩 ${esc(r.protein)}</span><span class="pill">🍚 ${esc(r.carb)}</span><span class="pill">🥬 ${esc(r.produce)}</span></div><div class="scale-row"><strong>Escalar:</strong>${[.5,1,1.5,2].map(v=>`<button class="chip ${scale===v?'active':''}" data-scale="${v}">${v}×</button>`).join('')}</div><h3>Ingredientes</h3><ul class="ingredients">${(r.ingredients||[]).map(i=>`<li><span>${esc(i.name)}</span><b>${i.qty!=null?fmtQty(i.qty*scale):''} ${esc(i.unit||'')}</b></li>`).join('')}</ul><h3>Preparación</h3><div class="steps">${esc(r.steps)}</div><div class="card" style="margin-top:12px"><h3>👧 Adaptación niño de 4 años</h3><div class="sub">${esc(r.childNote)}</div></div><div class="card" style="margin-top:12px"><h3>Aprender más</h3><div class="sub">Los enlaces abren buscadores culinarios externos en una pestaña nueva. Verifica ingredientes y porciones antes de adaptar una receta.</div>${refLinks(r)}</div>`;
+    $('#recipeModal').classList.add('open');document.body.style.overflow='hidden';
+    bindRecipeClosers();bindFav($('#recipeModalBody'));
+    $$('[data-scale]').forEach(b=>b.onclick=()=>{scale=Number(b.dataset.scale);draw()});
+  };
+  draw();
+};
+
+bindRecipeClosers();
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeRecipeModal()});
 })();
