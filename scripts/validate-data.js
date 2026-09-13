@@ -20,7 +20,9 @@ for(let day=1;day<=30;day++){for(const t of ['Desayuno','Almuerzo','Cena'])if(!s
 const lentil=D.recipes.filter(r=>String(`${r.name} ${r.protein} ${r.ingredientsText}`).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().includes('lentej')).length;if(lentil<20)fail(`Expected broad lentil coverage, got ${lentil}`);
 const shopping=new Map();for(const r of scheduled)for(const i of r.ingredients||[]){const k=`${i.name}|${i.unit}`;shopping.set(k,(shopping.get(k)||0)+Number(i.qty||0))}if(shopping.size<40)fail('Shopping consolidation unexpectedly small');
 if(!C)fail('Meal component catalog missing');
-const mins={proteins:20,salads:15,cookedVegetables:20,carbs:14,sauces:10,soups:10};const componentIds=[];
+const mins={proteins:20,salads:15,cookedVegetables:20,carbs:14,sauces:30,soups:30};const componentIds=[];
 for(const [group,min] of Object.entries(mins)){if(!Array.isArray(C[group])||C[group].length<min)fail(`${group}: expected at least ${min}, got ${C[group]?.length||0}`);for(const x of C[group]){if(!x.id||!x.name||!Array.isArray(x.ingredients)||!x.ingredients.length)fail(`${group}: invalid component ${x.id||x.name||'unknown'}`);componentIds.push(x.id)}}
+for(const x of C.sauces){if(!Array.isArray(x.uses)||x.uses.length<3)fail(`Sauce ${x.id} needs at least 3 usage recommendations`);if(!Array.isArray(x.pairs)||x.pairs.length<2)fail(`Sauce ${x.id} needs pairing metadata`)}
+for(const x of C.soups){if(!x.mealRole)fail(`Soup ${x.id} missing mealRole`);if(typeof x.containsCarb!=='boolean'||typeof x.containsProtein!=='boolean')fail(`Soup ${x.id} missing nutrition flags`);if(!x.note)fail(`Soup ${x.id} missing usage note`)}
 if(new Set(componentIds).size!==componentIds.length)fail('Duplicate meal component IDs');
 console.log(`OK: ${D.recipes.length} recipes (${scheduled.length} scheduled + ${library.length} library), ${lentil} lentil recipes, ${shopping.size} scheduled shopping items; components: ${C.proteins.length} proteins, ${C.salads.length} salads, ${C.cookedVegetables.length} cooked vegetables, ${C.carbs.length} carbs, ${C.sauces.length} sauces, ${C.soups.length} soups.`);
