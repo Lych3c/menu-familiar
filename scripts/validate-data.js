@@ -1,5 +1,5 @@
 const fs=require('fs');const vm=require('vm');global.window=global;
-['data/base.js','data/v3-init.js','data/v3-breakfasts.js','data/v3-lunches.js','data/v3-dinners.js','data/v4-library.js'].forEach(f=>vm.runInThisContext(fs.readFileSync(f,'utf8'),{filename:f}));
+['data/base.js','data/v3-init.js','data/v3-breakfasts.js','data/v3-lunches.js','data/v3-dinners.js','data/v4-library.js','data/v4-fixes.js'].forEach(f=>vm.runInThisContext(fs.readFileSync(f,'utf8'),{filename:f}));
 const D=global.MENU_APP_DATA;
 function fail(m){console.error('VALIDATION ERROR:',m);process.exit(1)}
 if(!D||!Array.isArray(D.recipes))fail('Dataset missing');
