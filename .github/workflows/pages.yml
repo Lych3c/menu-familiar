@@ -31,6 +31,7 @@ jobs:
           node --check js/settings.js
           node --check js/profile-backup.js
           node --check js/weekly-planner.js
+          node --check js/weekly-home.js
           node --check js/ai-client.js
           node --check data/components.js
           node --check data/culinary-extensions.js
@@ -39,7 +40,7 @@ jobs:
         run: |
           test -f v7.css
           test -f service-worker.js
-          grep -q "menu-familiar-v7-0" service-worker.js
+          grep -q "menu-familiar-v7-1" service-worker.js
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
