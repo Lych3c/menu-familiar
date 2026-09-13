@@ -1,96 +1,110 @@
 # Menú Familiar Inteligente
 
-PWA familiar para planificación de menús, recetas, despensa, lista de compras y generación inteligente de recetas.
+PWA familiar para planificación de menús, recetas, despensa, lista de compras y asistencia culinaria local, preparada para integrar IA mediante un backend seguro.
 
-## Estado actual — V2.1
+## Estado actual — V7
 
 La aplicación incluye:
 
-- Plan original de 30 días y 90 preparaciones únicas.
-- Menú diario y calendario de 30 días.
-- Biblioteca de recetas con búsqueda, filtros y favoritos.
-- Escalado de cantidades de recetas.
-- Despensa local con ingredientes disponibles.
-- Marcado **★ consumir primero** para reducir desperdicio.
-- Recomendador local que calcula compatibilidad entre la despensa y las 90 recetas.
-- Filtro por máximo de ingredientes faltantes.
-- Lista de compras semanal y mensual con persistencia local.
-- Enlaces de referencia para videos, recetas, técnica avanzada y versiones gourmet.
-- PWA instalable, modo offline y tema claro/oscuro.
-- Arquitectura preparada para conectar IA mediante un backend seguro.
+- Plan base de 30 días con 90 comidas programadas.
+- Biblioteca de 300 recetas estáticas: 90 desayunos, 120 almuerzos y 90 cenas.
+- Biblioteca adicional separada del plan mensual para no inflar las compras.
+- Búsqueda por ingrediente, tipo de comida, favoritos y procedencia.
+- Despensa mediante texto libre y análisis de lenguaje natural básico.
+- Inventario cuantificado con cantidad, unidad, fecha de vencimiento y prioridad de consumo.
+- Recomendador local ponderado por ingredientes principales.
+- Constructor manual de almuerzo: proteína + componente vegetal + carbohidrato.
+- Componentes vegetales crudos, salteados, al vapor, horneados y guisados.
+- Constructor automático con propuestas por compatibilidad, rapidez y menor número de compras.
+- Catálogos de proteínas, ensaladas, verduras cocidas, carbohidratos, sopas/cremas y salsas/aderezos.
+- Planificador inteligente de 7 días con reemplazo de platos.
+- Priorización de ingredientes próximos a vencer.
+- Perfil familiar configurable: integrantes, edades, presupuesto, tiempos, restricciones y alimentos que no gustan.
+- Escalado aproximado de cantidades según el perfil familiar.
+- Recalculo de compras del plan semanal descontando cantidades registradas en despensa cuando las unidades son compatibles.
+- Lista de compras del plan mensual calculada exclusivamente con las 90 recetas programadas.
+- Lista adicional para faltantes provenientes de despensa, constructor y plan semanal.
+- Exportación e importación de todos los datos locales para trasladarlos entre dispositivos.
+- Identificación de procedencia: plan mensual propio, biblioteca propia o receta generada por IA.
+- PWA instalable, funcionamiento offline y tema claro/oscuro.
+- Validaciones automáticas de datos y sintaxis antes de cada despliegue en GitHub Pages.
 
-## Seguridad de la IA
+## IA: arquitectura preparada, no dependiente
 
-No se debe guardar una clave de API en este repositorio, en JavaScript, en GitHub Pages ni en el navegador. GitHub Pages aloja únicamente el frontend.
+La aplicación funciona sin IA. Para generar recetas nuevas con un modelo externo debe configurarse un endpoint HTTPS seguro desde **Ajustes**.
 
-La arquitectura prevista es:
+Nunca se debe guardar una clave de API en este repositorio, en JavaScript, en GitHub Pages ni en `localStorage`.
+
+Arquitectura prevista:
 
 ```text
 Teléfono / PWA en GitHub Pages
         |
-        +-- motor local de recetas y despensa
+        +-- motores locales
+        |    +-- despensa
+        |    +-- biblioteca
+        |    +-- constructor
+        |    +-- planificador semanal
+        |    +-- compras
         |
-        +-- POST /api/generar-receta
+        +-- POST endpoint seguro (opcional)
                     |
-                    +-- backend serverless con secreto
+                    +-- función serverless / backend
                               |
                               +-- proveedor de IA
 ```
 
-La app permite configurar la URL del endpoint desde **Ajustes**, pero nunca una clave secreta.
+### Contrato esperado del endpoint
 
-### Contrato esperado del endpoint de IA
-
-Solicitud `POST` JSON:
+Solicitud `POST` JSON aproximada:
 
 ```json
 {
-  "family": "2 adultos + niño de 4 años",
-  "country": "Colombia",
-  "budget": "Medio",
-  "meal": "Cena",
-  "maxTime": 30,
-  "style": "Familiar",
-  "pantry": [
-    {"name":"Pollo","qty":"","unit":"g","priority":true}
-  ],
-  "requirements": {"completeMeal":true,"childAge":4}
+  "task": "generate_recipe",
+  "prompt": "Tengo pollo, arroz y tomate. Crea una cena en 30 minutos.",
+  "context": {
+    "country": "Colombia",
+    "familyProfile": {},
+    "pantry": [],
+    "rules": {
+      "healthyPlate": true,
+      "maxMajorCarbs": 2,
+      "childFriendly": true
+    }
+  }
 }
 ```
 
-Respuesta JSON recomendada:
+La respuesta debe contener una receta estructurada con `name`, `type`, `ingredients` y `steps`. Las recetas aceptadas se guardan localmente con procedencia `IA generativa`.
 
-```json
-{
-  "name": "Pollo criollo con papa y verduras",
-  "summary": "Cena completa para tres personas",
-  "ingredients": [
-    {"name":"Pechuga de pollo","qty":400,"unit":"g"}
-  ],
-  "steps": ["Preparar...", "Cocinar..."],
-  "childNote": "Servir en trozos pequeños y con condimentos suaves."
-}
-```
+## Datos y privacidad
+
+Todos los datos de uso permanecen en el dispositivo mediante `localStorage`: perfil familiar, favoritos, despensa, cantidades, vencimientos, compras, recetas IA y plan semanal.
+
+Mientras no exista sincronización en la nube, **Ajustes → Exportar datos** permite crear una copia JSON e importarla en otro dispositivo.
 
 ## GitHub Pages
 
-El workflow `.github/workflows/pages.yml` despliega la raíz del repositorio a GitHub Pages cada vez que se actualiza `main`.
+El workflow `.github/workflows/pages.yml` valida y despliega automáticamente la rama `main`.
 
-URL esperada:
+Aplicación:
 
 `https://lych3c.github.io/menu-familiar/`
 
-Si GitHub solicita configuración manual la primera vez: **Settings → Pages → Source: GitHub Actions**.
+## Límite deliberado del producto
 
-## Datos
+El proyecto busca resolver bien estas preguntas:
 
-Los datos base están divididos entre `data/base.js` y `data/recipes-01.js` a `data/recipes-06.js`. Los datos personales de uso —favoritos, despensa, compras, fecha de inicio y configuración— permanecen en `localStorage` del dispositivo.
+- ¿Qué vamos a comer?
+- ¿Qué puedo cocinar con lo que tengo?
+- ¿Qué se está por vencer?
+- ¿Qué necesito comprar?
+- ¿Cómo puedo variar una comida sin romper el plan?
 
-## Próximas fases
+No pretende sustituir una valoración médica o nutricional individual, ni convertirse en una plataforma de comercio, pagos o domicilios.
 
-1. Backend serverless para IA con validación de esquema, CORS restringido y rate limiting.
-2. Guardar recetas generadas en el recetario local.
-3. Reemplazar comidas del calendario y recalcular compras.
-4. Cantidades reales de despensa y consumo automático por receta.
-5. Fuentes culinarias curadas por receta, además de búsquedas externas.
-6. Exportación/importación del estado familiar.
+## Pendientes que requieren infraestructura externa
+
+- Backend seguro para IA real.
+- Sincronización automática entre varios teléfonos.
+- Base de datos y autenticación multiusuario, si llegaran a ser necesarias.
