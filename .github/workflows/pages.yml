@@ -26,10 +26,20 @@ jobs:
           node --check js/recipes.js
           node --check js/pantry.js
           node --check js/auto-builder.js
+          node --check js/pantry-inventory.js
           node --check js/shopping.js
           node --check js/settings.js
+          node --check js/profile-backup.js
+          node --check js/weekly-planner.js
+          node --check js/ai-client.js
           node --check data/components.js
           node --check data/culinary-extensions.js
+          node --check data/provenance.js
+      - name: Verify required offline assets
+        run: |
+          test -f v7.css
+          test -f service-worker.js
+          grep -q "menu-familiar-v7-0" service-worker.js
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
