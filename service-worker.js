@@ -1,4 +1,4 @@
-const CACHE='menu-familiar-v4-0';
+const CACHE='menu-familiar-v4-1';
 const ASSETS=['./','./index.html','./styles.css','./v3.css','./manifest.webmanifest','./icons/app-icon.svg','./data/base.js','./data/v3-init.js','./data/v3-breakfasts.js','./data/v3-lunches.js','./data/v3-dinners.js','./data/components.js','./data/v4-library.js','./js/core.js','./js/recipes.js','./js/pantry.js','./js/shopping.js','./js/settings.js'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
