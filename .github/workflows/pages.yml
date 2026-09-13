@@ -35,6 +35,7 @@ jobs:
           node --check js/weekly-planner.js
           node --check js/weekly-home.js
           node --check js/ai-client.js
+          node --check js/v9-ux.js
           node --check data/components.js
           node --check data/culinary-extensions.js
           node --check data/provenance.js
@@ -42,8 +43,12 @@ jobs:
       - name: Verify required offline assets
         run: |
           test -f v7.css
+          test -f v9.css
+          test -f js/v9-ux.js
           test -f service-worker.js
-          grep -q "menu-familiar-v8-1" service-worker.js
+          grep -q "menu-familiar-v9-0" service-worker.js
+          grep -q "js/v9-ux.js" service-worker.js
+          grep -q "v9.css" service-worker.js
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
