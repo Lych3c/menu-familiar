@@ -20,6 +20,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate menu and component data
         run: node scripts/validate-data.js
+      - name: Validate contextual pairings
+        run: node scripts/validate-pairings.js
       - name: Validate JavaScript syntax
         run: |
           node --check js/core.js
@@ -36,11 +38,12 @@ jobs:
           node --check data/components.js
           node --check data/culinary-extensions.js
           node --check data/provenance.js
+          node --check scripts/validate-pairings.js
       - name: Verify required offline assets
         run: |
           test -f v7.css
           test -f service-worker.js
-          grep -q "menu-familiar-v8-0" service-worker.js
+          grep -q "menu-familiar-v8-1" service-worker.js
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
