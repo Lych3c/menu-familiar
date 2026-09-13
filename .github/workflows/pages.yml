@@ -40,7 +40,7 @@ jobs:
         run: |
           test -f v7.css
           test -f service-worker.js
-          grep -q "menu-familiar-v7-1" service-worker.js
+          grep -q "menu-familiar-v8-0" service-worker.js
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
