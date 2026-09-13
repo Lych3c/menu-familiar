@@ -55,7 +55,7 @@ jobs:
           test -f data/international-recipes.js
           test -f data/world-expansion-2.js
           test -f service-worker.js
-          grep -q "menu-familiar-v11-0" service-worker.js
+          grep -q "menu-familiar-v11-1" service-worker.js
           grep -q "js/v10-world.js" service-worker.js
           grep -q "data/international-recipes.js" service-worker.js
           grep -q "data/world-expansion-2.js" service-worker.js
