@@ -22,7 +22,6 @@
       <button class="iconbtn" id="themeBtn" aria-label="Cambiar tema">◐</button>
     </div>
   </header>
-
   <main class="main">
     <section id="home" class="section active" aria-label="Inicio"></section>
     <section id="calendar" class="section" aria-label="Plan de 30 días"></section>
@@ -32,7 +31,6 @@
     <section id="settings" class="section" aria-label="Ajustes"></section>
   </main>
 </div>
-
 <nav class="bottomnav" aria-label="Navegación principal">
   <div class="navinner">
     <button class="navbtn active" data-tab="home"><span>🏠</span><span>Hoy</span></button>
@@ -42,26 +40,14 @@
     <button class="navbtn" data-tab="shopping"><span>🛒</span><span>Compras</span></button>
   </div>
 </nav>
-
 <button id="moreBtn" class="floating-more" aria-label="Abrir ajustes">⚙️</button>
-
-<div class="modal" id="recipeModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-  <div class="backdrop" data-close-modal></div>
-  <div class="sheet"><div class="sheet-inner"><div class="handle"></div><div id="recipeModalBody"></div></div></div>
-</div>
-
-<div class="modal" id="aiModal" role="dialog" aria-modal="true" aria-labelledby="aiModalTitle">
-  <div class="backdrop" data-close-ai></div>
-  <div class="sheet"><div class="sheet-inner"><div class="handle"></div><div id="aiModalBody"></div></div></div>
-</div>
-
+<div class="modal" id="recipeModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="backdrop" data-close-modal></div><div class="sheet"><div class="sheet-inner"><div class="handle"></div><div id="recipeModalBody"></div></div></div></div>
+<div class="modal" id="aiModal" role="dialog" aria-modal="true" aria-labelledby="aiModalTitle"><div class="backdrop" data-close-ai></div><div class="sheet"><div class="sheet-inner"><div class="handle"></div><div id="aiModalBody"></div></div></div></div>
 <script src="data/base.js"></script>
-<script src="data/recipes-01.js"></script>
-<script src="data/recipes-02.js"></script>
-<script src="data/recipes-03.js"></script>
-<script src="data/recipes-04.js"></script>
-<script src="data/recipes-05.js"></script>
-<script src="data/recipes-06.js"></script>
+<script src="data/v3-init.js"></script>
+<script src="data/v3-breakfasts.js"></script>
+<script src="data/v3-lunches.js"></script>
+<script src="data/v3-dinners.js"></script>
 <script src="js/core.js"></script>
 <script src="js/recipes.js"></script>
 <script src="js/pantry.js"></script>
