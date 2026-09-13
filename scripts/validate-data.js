@@ -10,7 +10,7 @@ if(library.length!==210)fail(`Expected 210 library recipes, got ${library.length
 const totals={Desayuno:90,Almuerzo:120,Cena:90};
 for(const [t,expected] of Object.entries(totals)){const n=D.recipes.filter(r=>r.type===t).length;if(n!==expected)fail(`${t}: expected ${expected}, got ${n}`);const p=scheduled.filter(r=>r.type===t).length;if(p!==30)fail(`${t}: expected 30 scheduled, got ${p}`)}
 if(new Set(D.recipes.map(r=>r.id)).size!==300)fail('Duplicate recipe IDs');
-if(new Set(D.recipes.map(r=>r.name)).size!==300)fail('Duplicate recipe names');
+const nameCount=new Map();for(const r of D.recipes)nameCount.set(r.name,(nameCount.get(r.name)||0)+1);const duplicateNames=[...nameCount.entries()].filter(([,c])=>c>1).map(([n])=>n);if(duplicateNames.length)fail(`Duplicate recipe names: ${duplicateNames.join(' | ')}`);
 if(!Array.isArray(D.menu)||D.menu.length!==30)fail('Menu must have 30 days');
 const carbCats=new Set(['Cereales y derivados','Tubérculos y plátanos']);
 function carbFamily(name){const n=String(name).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();if(n.includes('papa'))return'papa';if(n.includes('arroz'))return'arroz';if(n.includes('yuca'))return'yuca';if(n.includes('platano'))return'platano';if(n.includes('guineo'))return'guineo';if(n.includes('arepa'))return'arepa';if(n.includes('mazorca')||n.includes('maiz')||n.includes('tortilla')||n.includes('envuelto'))return'maiz';if(n.includes('avena'))return'avena';if(n.includes('quinua')||n.includes('quinoa'))return'quinua';if(n.includes('pasta')||n.includes('fideo'))return'pasta';if(n.includes('pan'))return'pan';if(n.includes('batata'))return'batata';return n}
