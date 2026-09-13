@@ -1,4 +1,4 @@
-const CACHE='menu-familiar-v11-0';
+const CACHE='menu-familiar-v11-1';
 const ASSETS=['./','./index.html','./styles.css','./v3.css','./auto-builder.css','./v7.css','./v9.css','./v10.css','./manifest.webmanifest','./icons/app-icon.svg','./data/base.js','./data/v3-init.js','./data/v3-breakfasts.js','./data/v3-lunches.js','./data/v3-dinners.js','./data/components.js','./data/culinary-extensions.js','./data/v4-library.js','./data/v4-fixes.js','./data/international-recipes.js','./data/world-expansion-2.js','./data/provenance.js','./js/core.js','./js/recipes.js','./js/pantry.js','./js/auto-builder.js','./js/pantry-inventory.js','./js/shopping.js','./js/settings.js','./js/profile-backup.js','./js/weekly-planner.js','./js/weekly-home.js','./js/ai-client.js','./js/v9-ux.js','./js/v9-calendar-observer.js','./js/v10-world.js'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
