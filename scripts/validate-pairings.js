@@ -1,9 +1,9 @@
 const fs=require('fs'),vm=require('vm');global.window=global;
-['data/base.js','data/v3-init.js','data/v3-breakfasts.js','data/v3-lunches.js','data/v3-dinners.js','data/components.js','data/culinary-extensions.js','data/v4-library.js','data/v4-fixes.js'].forEach(f=>vm.runInThisContext(fs.readFileSync(f,'utf8'),{filename:f}));
+['data/base.js','data/v3-init.js','data/v3-breakfasts.js','data/v3-lunches.js','data/v3-dinners.js','data/components.js','data/culinary-extensions.js','data/v4-library.js','data/v4-fixes.js','data/international-recipes.js'].forEach(f=>vm.runInThisContext(fs.readFileSync(f,'utf8'),{filename:f}));
 const D=global.MENU_APP_DATA,C=global.MF_COMPONENTS;
 function fail(m){console.error('PAIRING VALIDATION ERROR:',m);process.exit(1)}
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-const aliases={pollo:['pollo','pechuga','muslo'],res:['res','carne de res','bistec','albondiga'],cerdo:['cerdo','lomo de cerdo'],pescado:['pescado','tilapia','trucha','atun'],huevo:['huevo'],lenteja:['lenteja'],frijol:['frijol','frijoles'],garbanzo:['garbanzo'],arveja:['arveja'],arroz:['arroz'],papa:['papa'],yuca:['yuca'],platano:['platano'],arepa:['arepa'],maiz:['maiz','mazorca'],pasta:['pasta','fideo'],avena:['avena'],quinua:['quinua','quinoa'],pan:['pan'],batata:['batata']};
+const aliases={pollo:['pollo','pechuga','muslo'],res:['res','carne de res','bistec','albondiga'],cerdo:['cerdo','lomo de cerdo'],pescado:['pescado','tilapia','trucha','atun','salmon'],huevo:['huevo'],tofu:['tofu'],lenteja:['lenteja'],frijol:['frijol','frijoles'],garbanzo:['garbanzo'],arveja:['arveja'],arroz:['arroz'],papa:['papa'],yuca:['yuca'],platano:['platano'],arepa:['arepa'],maiz:['maiz','mazorca','tortilla','polenta'],pasta:['pasta','fideo','soba','udon'],avena:['avena'],quinua:['quinua','quinoa'],pan:['pan'],batata:['batata']};
 function canonical(v){const n=norm(v);for(const [k,arr] of Object.entries(aliases))if(arr.some(a=>n===norm(a)||n.includes(norm(a))||norm(a).includes(n)))return k;return n}
 function soupCarbs(s){return new Set((s.ingredients||[]).map(canonical).filter(x=>['arroz','papa','yuca','platano','arepa','maiz','pasta','avena','quinua','pan','batata','lenteja','frijol','garbanzo','arveja'].includes(x)))}
 if(!D?.recipes?.length)fail('recipes missing');
