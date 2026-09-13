@@ -41,6 +41,7 @@ jobs:
           node --check data/components.js
           node --check data/culinary-extensions.js
           node --check data/international-recipes.js
+          node --check data/world-expansion-2.js
           node --check data/provenance.js
           node --check scripts/validate-pairings.js
       - name: Verify required offline assets
@@ -52,10 +53,12 @@ jobs:
           test -f js/v9-calendar-observer.js
           test -f js/v10-world.js
           test -f data/international-recipes.js
+          test -f data/world-expansion-2.js
           test -f service-worker.js
-          grep -q "menu-familiar-v10-0" service-worker.js
+          grep -q "menu-familiar-v11-0" service-worker.js
           grep -q "js/v10-world.js" service-worker.js
           grep -q "data/international-recipes.js" service-worker.js
+          grep -q "data/world-expansion-2.js" service-worker.js
           grep -q "v10.css" service-worker.js
       - name: Configure Pages
         uses: actions/configure-pages@v5
