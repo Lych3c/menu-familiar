@@ -1,0 +1,1 @@
+(()=>{const D=window.MENU_APP_DATA;const fixes={BDES001:'Arepa integral dorada con huevo perico y papaya',BDES038:'Quinua cremosa en leche con manzana, canela y queso'};for(const r of D.recipes){if(fixes[r.id])r.name=fixes[r.id]}D.meta.libraryRecipes=D.recipes.length;})();
