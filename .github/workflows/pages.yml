@@ -18,16 +18,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate V3 menu data
+      - name: Validate menu and component data
         run: node scripts/validate-data.js
       - name: Validate JavaScript syntax
         run: |
           node --check js/core.js
           node --check js/recipes.js
           node --check js/pantry.js
+          node --check js/auto-builder.js
           node --check js/shopping.js
           node --check js/settings.js
           node --check data/components.js
+          node --check data/culinary-extensions.js
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
