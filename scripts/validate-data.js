@@ -1,6 +1,6 @@
 const fs=require('fs');const vm=require('vm');global.window=global;
-['data/base.js','data/v3-init.js','data/v3-breakfasts.js','data/v3-lunches.js','data/v3-dinners.js','data/v4-library.js','data/v4-fixes.js'].forEach(f=>vm.runInThisContext(fs.readFileSync(f,'utf8'),{filename:f}));
-const D=global.MENU_APP_DATA;
+['data/base.js','data/v3-init.js','data/v3-breakfasts.js','data/v3-lunches.js','data/v3-dinners.js','data/v4-library.js','data/v4-fixes.js','data/components.js'].forEach(f=>vm.runInThisContext(fs.readFileSync(f,'utf8'),{filename:f}));
+const D=global.MENU_APP_DATA,C=global.MF_COMPONENTS;
 function fail(m){console.error('VALIDATION ERROR:',m);process.exit(1)}
 if(!D||!Array.isArray(D.recipes))fail('Dataset missing');
 if(D.recipes.length!==300)fail(`Expected 300 recipes, got ${D.recipes.length}`);
@@ -19,4 +19,8 @@ for(const r of D.recipes){if(!r.ingredients?.length)fail(`${r.id} has no ingredi
 for(let day=1;day<=30;day++){for(const t of ['Desayuno','Almuerzo','Cena'])if(!scheduled.find(r=>r.day===day&&r.type===t))fail(`Missing ${t} on day ${day}`)}
 const lentil=D.recipes.filter(r=>String(`${r.name} ${r.protein} ${r.ingredientsText}`).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().includes('lentej')).length;if(lentil<20)fail(`Expected broad lentil coverage, got ${lentil}`);
 const shopping=new Map();for(const r of scheduled)for(const i of r.ingredients||[]){const k=`${i.name}|${i.unit}`;shopping.set(k,(shopping.get(k)||0)+Number(i.qty||0))}if(shopping.size<40)fail('Shopping consolidation unexpectedly small');
-console.log(`OK: ${D.recipes.length} unique recipes (${scheduled.length} scheduled + ${library.length} library), ${lentil} lentil recipes, ${shopping.size} scheduled shopping items, carbohydrate rules validated.`);
+if(!C)fail('Meal component catalog missing');
+const mins={proteins:20,salads:15,cookedVegetables:20,carbs:14};const componentIds=[];
+for(const [group,min] of Object.entries(mins)){if(!Array.isArray(C[group])||C[group].length<min)fail(`${group}: expected at least ${min}, got ${C[group]?.length||0}`);for(const x of C[group]){if(!x.id||!x.name||!Array.isArray(x.ingredients)||!x.ingredients.length)fail(`${group}: invalid component ${x.id||x.name||'unknown'}`);componentIds.push(x.id)}}
+if(new Set(componentIds).size!==componentIds.length)fail('Duplicate meal component IDs');
+console.log(`OK: ${D.recipes.length} recipes (${scheduled.length} scheduled + ${library.length} library), ${lentil} lentil recipes, ${shopping.size} scheduled shopping items; components: ${C.proteins.length} proteins, ${C.salads.length} salads, ${C.cookedVegetables.length} cooked vegetables, ${C.carbs.length} carbs.`);
