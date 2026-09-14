@@ -8,7 +8,10 @@ const countries=[
  {name:'México',flag:'🇲🇽',note:'Maíz, fríjol, tomate, aguacate, verduras y preparaciones familiares.'},
  {name:'Tailandia',flag:'🇹🇭',note:'Wok, hierbas aromáticas, lima, coco, arroz y equilibrio entre ácido, salado, dulce y picante suave.'},
  {name:'Corea del Sur',flag:'🇰🇷',note:'Arroz, verduras, fermentados, tofu, huevo y salteados con contrastes de textura.'},
- {name:'Perú',flag:'🇵🇪',note:'Papa, maíz, quinua, ajíes, pescado, hierbas y técnicas de salteado, escabeche y guiso.'}
+ {name:'Perú',flag:'🇵🇪',note:'Papa, maíz, quinua, ajíes, pescado, hierbas y técnicas de salteado, escabeche y guiso.'},
+ {name:'India',flag:'🇮🇳',note:'Leguminosas, especias aromáticas, yogur, arroz, verduras y currys familiares de intensidad moderada.'},
+ {name:'España',flag:'🇪🇸',note:'Arroz, pescado, leguminosas, verduras, sofritos, plancha y cocina mediterránea cotidiana.'},
+ {name:'Grecia',flag:'🇬🇷',note:'Yogur, limón, aceite de oliva, leguminosas, verduras, pescado y hierbas mediterráneas.'}
 ];
 const styles=[
  {key:'wok',label:'🔥 Wok / salteado'},
@@ -25,16 +28,16 @@ function saveWorld(){localStorage.setItem('mf_worldFilters',JSON.stringify(world
 function worldRecipes(){return D.recipes.filter(r=>r.world&&r.cuisine)}
 function counts(){const out={};for(const c of countries)out[c.name]=worldRecipes().filter(r=>r.cuisine===c.name).length;return out}
 function recipeText(r){return norm(`${r.name} ${r.cuisine||''} ${r.origin||''} ${r.type||''} ${r.protein||''} ${r.carb||''} ${r.produce||''} ${r.steps||''} ${r.chefTip||''} ${(r.ingredients||[]).map(i=>i.name).join(' ')}`)}
-function isVegetarian(r){const t=norm(`${r.protein||''} ${(r.ingredients||[]).map(i=>i.name).join(' ')}`);return !/(pollo|pechuga|muslo|res|carne|cerdo|lomo|pescado|tilapia|trucha|atun|salmon|camaron|marisco|langostino|anchov)/.test(t)}
+function isVegetarian(r){const t=norm(`${r.protein||''} ${(r.ingredients||[]).map(i=>i.name).join(' ')}`);return !/(pollo|pechuga|muslo|res|carne|cerdo|lomo|pescado|tilapia|trucha|atun|salmon|camaron|marisco|langostino|anchov|merluza)/.test(t)}
 function styleMatch(r,key){const t=recipeText(r),carb=norm(r.carb||''),chef=norm(r.chefTip||'');switch(key){
- case'wok':return /(wok|saltead|pad thai|yakisoba|japchae|lomo saltado|pad kra pao)/.test(t);
- case'curry':return /curry/.test(t);
+ case'wok':return /(wok|saltead|pad thai|yakisoba|japchae|lomo saltado|pad kra pao|stir fry)/.test(t);
+ case'curry':return /(curry|korma|masala|dal|tikka)/.test(t);
  case'pasta':return /(pasta|fideo|soba|udon|noodle|yakisoba)/.test(`${t} ${carb}`);
- case'soup':return /(sopa|caldo|minestrone|pozole|tom yum|tom kha)/.test(t);
- case'rice':return /(arroz|risotto|donburi|bibimbap|oyakodon|fried rice|chaufa|tacu tacu)/.test(`${t} ${carb}`);
+ case'soup':return /(sopa|caldo|minestrone|pozole|tom yum|tom kha|gazpacho|jok|khao tom)/.test(t);
+ case'rice':return /(arroz|risotto|donburi|bibimbap|oyakodon|fried rice|chaufa|tacu tacu|biryani|paella|khichdi)/.test(`${t} ${carb}`);
  case'vegetarian':return isVegetarian(r);
  case'fast':return Number(r.time||999)<=30;
- case'chef':return /(sell|desglas|emulsion|reduc|glase|monta|temperatura|al dente|pocha|dora por tandas|fuego alto|textura|wok)/.test(chef);
+ case'chef':return /(sell|desglas|emulsion|reduc|glase|monta|temperatura|al dente|pocha|dora por tandas|fuego alto|textura|wok|reposo|marina)/.test(chef);
  default:return true}}
 function activeLibraryTab(){return $('#recipes [data-v9-library].active')?.dataset?.v9Library||'Todos'}
 function worldCompatibleTab(tab){return['Todos','Favoritos','Desayuno','Almuerzo','Cena'].includes(tab)}
@@ -61,13 +64,7 @@ function enhanceRecipes(){
  if(worldState.enabled)requestAnimationFrame(()=>renderWorldFiltered(false));else syncWorldUi([]);
 }
 const baseRecipes=M.renderers.recipes;M.renderers.recipes=()=>{baseRecipes?.();enhanceRecipes()};
-
-function worldModal(id){
- const r=D.recipes.find(x=>x.id===id);if(!r?.world)return;
- const body=$('#recipeModalBody');if(!body||body.querySelector('.v10-cuisine-card'))return;
- const country=countries.find(c=>c.name===r.cuisine),target=body.querySelector('.v9-detailed-prep')||body.querySelector('.steps');if(!target)return;
- target.insertAdjacentHTML('afterend',`<section class="card v10-cuisine-card"><div class="v10-cuisine-title"><span>${country?.flag||'🌍'}</span><div><h3>${esc(r.cuisine)}</h3><p>${esc(country?.note||'Cocina internacional adaptada al contexto familiar.')}</p></div></div><div class="v10-chef-tip"><b>👨‍🍳 Técnica destacada</b><p>${esc(r.chefTip||'Trabaja temperatura, textura y presentación con precisión, sin añadir complejidad innecesaria.')}</p></div><div class="sub">Adaptación familiar inspirada en esa tradición culinaria; no pretende reproducir de forma estrictamente regional cada preparación.</div></section>`)
-}
+function worldModal(id){const r=D.recipes.find(x=>x.id===id);if(!r?.world)return;const body=$('#recipeModalBody');if(!body||body.querySelector('.v10-cuisine-card'))return;const country=countries.find(c=>c.name===r.cuisine),target=body.querySelector('.v9-detailed-prep')||body.querySelector('.steps');if(!target)return;target.insertAdjacentHTML('afterend',`<section class="card v10-cuisine-card"><div class="v10-cuisine-title"><span>${country?.flag||'🌍'}</span><div><h3>${esc(r.cuisine)}</h3><p>${esc(country?.note||'Cocina internacional adaptada al contexto familiar.')}</p></div></div><div class="v10-chef-tip"><b>👨‍🍳 Técnica destacada</b><p>${esc(r.chefTip||'Trabaja temperatura, textura y presentación con precisión, sin añadir complejidad innecesaria.')}</p></div><div class="sub">Adaptación familiar inspirada en esa tradición culinaria; no pretende reproducir de forma estrictamente regional cada preparación.</div></section>`)}
 const baseOpen=M.openRecipe;if(baseOpen)M.openRecipe=id=>{baseOpen(id);requestAnimationFrame(()=>requestAnimationFrame(()=>worldModal(id)))};
 document.addEventListener('click',e=>{if(e.target.closest('#recipeModalBody [data-scale], #recipeModalBody [data-adapt]')){const title=$('#modalTitle')?.textContent,r=D.recipes.find(x=>x.name===title);if(r?.world)requestAnimationFrame(()=>requestAnimationFrame(()=>worldModal(r.id)))}});
 function annotatePlan(){const root=$('#calendar');if(!root)return;root.querySelectorAll('.week-meal').forEach(row=>{if(row.querySelector('.v10-origin-mini'))return;const title=row.querySelector('b')?.textContent?.trim(),r=D.recipes.find(x=>x.name===title);if(!r?.world)return;const country=countries.find(c=>c.name===r.cuisine);row.querySelector('small')?.insertAdjacentHTML('beforeend',` <span class="v10-origin-mini">· ${country?.flag||'🌍'} ${esc(r.cuisine)}</span>`)})}
