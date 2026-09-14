@@ -62,7 +62,9 @@ jobs:
           test -f data/world-expansion-3.js
           test -f data/component-expansion-v12.js
           test -f service-worker.js
-          grep -q "menu-familiar-v12-0" service-worker.js
+          grep -q "menu-familiar-v13-0" service-worker.js
+          grep -q "js/pantry.js" service-worker.js
+          grep -q "js/auto-builder.js" service-worker.js
           grep -q "js/v12-library.js" service-worker.js
           grep -q "data/world-expansion-3.js" service-worker.js
           grep -q "data/component-expansion-v12.js" service-worker.js
